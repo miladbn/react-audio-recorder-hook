@@ -13,15 +13,9 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node", "vitest/globals"]
   },
   "include": ["src"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "src/tests",
-    "**/setup.ts",
-    "**/*.test.ts",
-    "**/*.test.tsx"
-  ]
+  "exclude": ["node_modules", "dist", "src/tests", "**/setup.ts", "**/*.test.ts", "**/*.test.tsx"]
 }
