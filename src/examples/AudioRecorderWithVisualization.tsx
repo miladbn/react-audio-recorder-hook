@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-uses-react */
-import React from 'react'; // This import is needed for JSX
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import React from 'react';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import useAudioRecorder from '../index';
 

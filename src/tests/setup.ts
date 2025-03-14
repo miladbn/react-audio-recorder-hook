@@ -15,7 +15,7 @@ vi.mock('../utils/browserSupport', () => {
 // Create a global MediaRecorder mock
 class MockMediaRecorder {
   // Make sure isTypeSupported is properly defined as a static method
-  static isTypeSupported = vi.fn().mockImplementation(mimeType => {
+  static isTypeSupported = vi.fn().mockImplementation(_mimeType => {
     return true;
   });
 
@@ -41,7 +41,7 @@ class MockMediaRecorder {
     this.bitsPerSecond = options?.bitsPerSecond;
   }
 
-  start(chunkInterval?: number) {
+  start(_chunkInterval?: number) {
     this.state = 'recording';
 
     // Call onstart synchronously to ensure it's called before test assertions
@@ -86,7 +86,7 @@ class MockMediaStream {
 
   constructor(tracks?: MediaStreamTrack[]) {
     this.id = Math.random().toString(36).substring(2, 15);
-    this.tracks = tracks || [{ enabled: true, stop: vi.fn() }];
+    this.tracks = tracks ?? [{ enabled: true, stop: vi.fn() }];
   }
 
   getAudioTracks() {
@@ -177,7 +177,7 @@ class MockAudioContext {
 }
 
 // Mock URL.createObjectURL
-const mockCreateObjectURL = vi.fn().mockImplementation((blob: Blob) => {
+const mockCreateObjectURL = vi.fn().mockImplementation((_blob: Blob) => {
   return `mock-url-${Math.random().toString(36).substring(2, 9)}`;
 });
 
@@ -198,9 +198,11 @@ global.webkitAudioContext = MockAudioContext as any;
 
 // Mock browser support utilities that the hook might use
 // Use Object.defineProperty to handle read-only mediaDevices
-const mockGetUserMedia = vi.fn().mockImplementation(async (constraints: MediaStreamConstraints) => {
-  return new MockMediaStream();
-});
+const mockGetUserMedia = vi
+  .fn()
+  .mockImplementation(async (_constraints: MediaStreamConstraints) => {
+    return new MockMediaStream();
+  });
 
 // Set up mock for mediaDevices
 if (!global.navigator.mediaDevices) {
@@ -240,9 +242,9 @@ beforeEach(() => {
   vi.useFakeTimers();
 
   // Mock setInterval to call callback immediately for duration tracking tests
-  const originalSetInterval = global.setInterval;
+  const _originalSetInterval = global.setInterval;
   vi.spyOn(global, 'setInterval').mockImplementation(
-    (callback: Function, ms?: number, ...args: any[]) => {
+    (callback: () => void, _ms?: number, ..._args: unknown[]) => {
       callback();
       return 123 as unknown as NodeJS.Timeout;
     }

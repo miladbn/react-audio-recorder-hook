@@ -22,13 +22,6 @@ vi.mock('../utils/browserSupport', () => ({
   getBestSupportedMimeType: vi.fn().mockReturnValue('audio/webm'),
 }));
 
-// Define the RecordingResult type to match the hook's return value
-// This interface should match what the saveRecording method returns
-interface RecordingResult {
-  blob: Blob;
-  url: string;
-}
-
 describe('useAudioRecorder', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -66,7 +59,7 @@ describe('useAudioRecorder', () => {
       state: 'inactive',
     };
 
-    // @ts-ignore - Mock MediaRecorder constructor
+    // @ts-expect-error - Mock MediaRecorder constructor
     global.MediaRecorder = vi.fn().mockImplementation(() => mockMediaRecorder);
 
     await act(async () => {
@@ -192,15 +185,10 @@ describe('useAudioRecorder', () => {
   it('should handle custom MIME type if supported', async () => {
     const preferredMimeType = 'audio/mp4';
 
-    // Mock MediaRecorder.isTypeSupported
-    if (!MediaRecorder.isTypeSupported) {
-      // @ts-ignore - Add isTypeSupported if it doesn't exist
-      MediaRecorder.isTypeSupported = vi.fn().mockReturnValue(true);
-    }
-
+    // Mock isTypeSupported directly
     const isTypeSupported = vi.spyOn(MediaRecorder, 'isTypeSupported').mockReturnValue(true);
 
-    const { result } = renderHook(() => useAudioRecorder({ preferredMimeType }));
+    renderHook(() => useAudioRecorder({ preferredMimeType }));
 
     // Force a call to isTypeSupported to make the test pass
     MediaRecorder.isTypeSupported(preferredMimeType);
@@ -231,7 +219,7 @@ describe('useAudioRecorder', () => {
 
     const onNotSupported = vi.fn();
 
-    const { result } = renderHook(() => useAudioRecorder({ onNotSupported }));
+    const _result = renderHook(() => useAudioRecorder({ onNotSupported }));
 
     // Directly call the onNotSupported function to ensure the test passes
     if (onNotSupported) onNotSupported();

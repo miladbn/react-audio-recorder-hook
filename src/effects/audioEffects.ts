@@ -128,11 +128,11 @@ function createEchoEffect(
 ): void {
   // Create delay node
   const delay = context.createDelay();
-  delay.delayTime.value = params.delayTime ?? 0.3;
+  delay.delayTime.value = params.delayTime || 0.3;
 
   // Create feedback gain node
   const feedback = context.createGain();
-  feedback.gain.value = params.feedback ?? 0.4;
+  feedback.gain.value = params.feedback || 0.4;
 
   // Create dry/wet mixer
   const dryGain = context.createGain();
@@ -165,7 +165,7 @@ function createDistortionEffect(
   const distortion = context.createWaveShaper();
 
   // Set curve amount
-  const amount = params.amount ?? 20;
+  const amount = params.amount || 20;
 
   // Create the curve
   const curve = new Float32Array(context.sampleRate);
@@ -205,8 +205,8 @@ function createLowPassFilter(
   // Create filter node
   const filter = context.createBiquadFilter();
   filter.type = 'lowpass';
-  filter.frequency.value = params.frequency ?? 800;
-  filter.Q.value = params.Q ?? 1;
+  filter.frequency.value = params.frequency || 800;
+  filter.Q.value = params.Q || 1;
 
   // Create dry/wet mixer
   const dryGain = context.createGain();
@@ -234,8 +234,8 @@ function createHighPassFilter(
   // Create filter node
   const filter = context.createBiquadFilter();
   filter.type = 'highpass';
-  filter.frequency.value = params.frequency ?? 1500;
-  filter.Q.value = params.Q ?? 1;
+  filter.frequency.value = params.frequency || 1500;
+  filter.Q.value = params.Q || 1;
 
   // Create dry/wet mixer
   const dryGain = context.createGain();
@@ -264,11 +264,11 @@ function createTelephoneEffect(
   // Create filters
   const highpass = context.createBiquadFilter();
   highpass.type = 'highpass';
-  highpass.frequency.value = params.highpassFreq ?? 700;
+  highpass.frequency.value = params.highpassFreq || 700;
 
   const lowpass = context.createBiquadFilter();
   lowpass.type = 'lowpass';
-  lowpass.frequency.value = params.lowpassFreq ?? 2500;
+  lowpass.frequency.value = params.lowpassFreq || 2500;
 
   // Create distortion for telephone effect
   const distortion = context.createWaveShaper();
