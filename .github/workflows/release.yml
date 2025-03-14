@@ -42,7 +42,7 @@ jobs:
       # If frozen install fails, update the lockfile
       - name: Install dependencies (update lockfile)
         if: steps.frozen-install.outcome == 'failure'
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Lint
         run: pnpm lint --max-warnings 50
