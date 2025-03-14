@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import browserSupport from './utils/browserSupport';
-import { AudioEffectType, AudioEffectOptions, applyAudioEffect } from './effects/audioEffects';
+import { AudioEffectType, type AudioEffectOptions, applyAudioEffect } from './effects/audioEffects';
 
 // Configuration options interface
 export interface AudioRecorderOptions {
