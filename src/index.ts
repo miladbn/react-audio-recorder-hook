@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 // Configuration options interface
 export interface AudioRecorderOptions {
@@ -29,16 +29,9 @@ export interface UseAudioRecorderReturn {
 export default function useAudioRecorder(
   options: AudioRecorderOptions = {}
 ): UseAudioRecorderReturn {
-  const {
-    audioConstraints = {},
-    chunkInterval = 500,
-    preferredMimeType,
-    onNotSupported,
-  } = options;
+  const { audioConstraints = {}, chunkInterval = 500, preferredMimeType, onNotSupported } = options;
 
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [recordingDuration, setRecordingDuration] = useState<number>(0);
@@ -46,7 +39,7 @@ export default function useAudioRecorder(
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const pausedChunksRef = useRef<Blob[]>([]);
-  const mimeTypeRef = useRef<string>("audio/webm");
+  const mimeTypeRef = useRef<string>('audio/webm');
   const audioUrlRef = useRef<string | null>(null);
 
   const cleanupAudioUrl = useCallback(() => {
@@ -59,20 +52,20 @@ export default function useAudioRecorder(
   const getSupportedMimeType = useCallback(() => {
     if (preferredMimeType && MediaRecorder.isTypeSupported(preferredMimeType)) {
       return preferredMimeType;
-    } else if (MediaRecorder.isTypeSupported("audio/webm")) {
-      return "audio/webm";
-    } else if (MediaRecorder.isTypeSupported("audio/ogg")) {
-      return "audio/ogg";
-    } else if (MediaRecorder.isTypeSupported("audio/wav")) {
-      return "audio/wav";
+    } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+      return 'audio/webm';
+    } else if (MediaRecorder.isTypeSupported('audio/ogg')) {
+      return 'audio/ogg';
+    } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+      return 'audio/wav';
     } else {
-      return "audio/webm";
+      return 'audio/webm';
     }
   }, [preferredMimeType]);
 
   const stopMediaStream = useCallback((stream: MediaStream | null) => {
     if (stream) {
-      stream.getTracks().forEach((track) => {
+      stream.getTracks().forEach(track => {
         track.stop();
       });
       setMediaStream(null);
@@ -87,7 +80,7 @@ export default function useAudioRecorder(
         if (onNotSupported) {
           onNotSupported();
         } else {
-          console.error("Your browser does not support audio recording.");
+          console.error('Your browser does not support audio recording.');
         }
         return;
       }
@@ -106,24 +99,18 @@ export default function useAudioRecorder(
       audioChunksRef.current = [];
       pausedChunksRef.current = [];
 
-      recorder.ondataavailable = (event) => {
+      recorder.ondataavailable = event => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
 
       recorder.onstop = async () => {
-        if (
-          audioChunksRef.current.length === 0 &&
-          pausedChunksRef.current.length === 0
-        ) {
+        if (audioChunksRef.current.length === 0 && pausedChunksRef.current.length === 0) {
           return;
         }
 
-        const allChunks = [
-          ...pausedChunksRef.current,
-          ...audioChunksRef.current,
-        ];
+        const allChunks = [...pausedChunksRef.current, ...audioChunksRef.current];
 
         const audioBlob = new Blob(allChunks, {
           type: mimeTypeRef.current,
@@ -151,14 +138,14 @@ export default function useAudioRecorder(
       }
 
       const newTimer = setInterval(() => {
-        setRecordingDuration((prevDuration) => prevDuration + 1);
+        setRecordingDuration(prevDuration => prevDuration + 1);
       }, 1000);
 
       setTimer(newTimer);
     } catch (error) {
       setIsRecording(false);
       setIsPaused(false);
-      console.error("Error starting recording:", error);
+      console.error('Error starting recording:', error);
     }
   }, [
     getSupportedMimeType,
@@ -172,14 +159,11 @@ export default function useAudioRecorder(
 
   // ... All other functions remain mostly the same
   const pauseRecording = useCallback(() => {
-    if (!mediaRecorder || mediaRecorder.state === "inactive" || isPaused) {
+    if (!mediaRecorder || mediaRecorder.state === 'inactive' || isPaused) {
       return;
     }
 
-    pausedChunksRef.current = [
-      ...pausedChunksRef.current,
-      ...audioChunksRef.current,
-    ];
+    pausedChunksRef.current = [...pausedChunksRef.current, ...audioChunksRef.current];
     audioChunksRef.current = [];
 
     mediaRecorder.pause();
@@ -192,7 +176,7 @@ export default function useAudioRecorder(
   }, [mediaRecorder, isPaused, timer]);
 
   const resumeRecording = useCallback(async () => {
-    if (!mediaRecorder || mediaRecorder.state !== "paused") {
+    if (!mediaRecorder || mediaRecorder.state !== 'paused') {
       return;
     }
 
@@ -201,23 +185,18 @@ export default function useAudioRecorder(
 
     if (!timer) {
       const newTimer = setInterval(() => {
-        setRecordingDuration((prevDuration) => prevDuration + 1);
+        setRecordingDuration(prevDuration => prevDuration + 1);
       }, 1000);
       setTimer(newTimer);
     }
   }, [mediaRecorder, timer]);
 
   const createAudioBlob = useCallback(() => {
-    if (
-      audioChunksRef.current.length === 0 &&
-      pausedChunksRef.current.length === 0
-    ) {
+    if (audioChunksRef.current.length === 0 && pausedChunksRef.current.length === 0) {
       return null;
     }
 
-    if (mediaRecorder && mediaRecorder.state === "recording") {
-      mediaRecorder.requestData();
-    }
+    mediaRecorder?.state === 'recording' && mediaRecorder.pause();
 
     const allChunks = [...pausedChunksRef.current, ...audioChunksRef.current];
 
@@ -254,7 +233,7 @@ export default function useAudioRecorder(
   }, [createAudioBlob]);
 
   const stopRecording = useCallback(async () => {
-    if (!mediaRecorder || mediaRecorder.state === "inactive") {
+    if (!mediaRecorder || mediaRecorder.state === 'inactive') {
       return;
     }
 
@@ -271,9 +250,7 @@ export default function useAudioRecorder(
   }, [mediaRecorder, timer]);
 
   const cancelRecording = useCallback(() => {
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
-      mediaRecorder.stop();
-    }
+    mediaRecorder?.state !== 'inactive' && mediaRecorder?.stop();
 
     stopMediaStream(mediaStream);
     setIsRecording(false);

@@ -36,6 +36,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Lint
+        run: pnpm lint --max-warnings 50
+
       - name: Run tests
         run: pnpm test:ci
 

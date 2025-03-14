@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import useAudioRecorder from '../index';
 
 interface AudioRecorderWithVisualizationProps {
@@ -38,20 +38,11 @@ export function AudioRecorderWithVisualization({
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Set up audio analysis when recording starts
-  useEffect(() => {
-    if (mediaStream && isRecording && !isPaused) {
-      setupAudioAnalysis();
-    } else if (!isRecording || isPaused) {
-      cleanupAudioAnalysis();
-    }
+  // Define AudioContext type
+  type AudioContextType = typeof window.AudioContext;
 
-    return () => {
-      cleanupAudioAnalysis();
-    };
-  }, [mediaStream, isRecording, isPaused]);
-
-  const setupAudioAnalysis = () => {
+  // Set up audio analysis functions with useCallback to memoize them
+  const setupAudioAnalysis = useCallback(() => {
     if (!mediaStream || !canvasRef.current) return;
 
     // Create audio context and analyser
@@ -69,7 +60,35 @@ export function AudioRecorderWithVisualization({
 
     // Start visualization
     startVisualization();
-  };
+  }, [mediaStream]);
+
+  // Define cleanupAudioAnalysis with useCallback before using it in useEffect
+  const cleanupAudioAnalysis = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(console.error);
+      audioContextRef.current = null;
+    }
+
+    audioAnalyserRef.current = null;
+  }, []);
+
+  // Use the dependency now that it's defined with useCallback
+  useEffect(() => {
+    if (mediaStream && isRecording && !isPaused) {
+      setupAudioAnalysis();
+    } else if (!isRecording || isPaused) {
+      cleanupAudioAnalysis();
+    }
+
+    return () => {
+      cleanupAudioAnalysis();
+    };
+  }, [mediaStream, isRecording, isPaused, setupAudioAnalysis, cleanupAudioAnalysis]);
 
   const startVisualization = () => {
     if (!canvasRef.current || !audioAnalyserRef.current) return;
@@ -104,7 +123,7 @@ export function AudioRecorderWithVisualization({
       // Draw the bars
       for (let i = 0; i < bufferLength; i++) {
         const barHeight = (dataArray[i] / 255) * canvas.height;
-        
+
         ctx.fillStyle = barColor;
         ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
 
@@ -113,20 +132,6 @@ export function AudioRecorderWithVisualization({
     };
 
     draw();
-  };
-
-  const cleanupAudioAnalysis = () => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-
-    if (audioContextRef.current) {
-      audioContextRef.current.close().catch(console.error);
-      audioContextRef.current = null;
-    }
-
-    audioAnalyserRef.current = null;
   };
 
   const handleStartRecording = async () => {
@@ -170,11 +175,11 @@ export function AudioRecorderWithVisualization({
   return (
     <div className={className}>
       <div style={{ marginBottom: '12px' }}>
-        <canvas 
+        <canvas
           ref={canvasRef}
           width={width}
           height={height}
-          style={{ 
+          style={{
             backgroundColor,
             borderRadius: '4px',
             display: 'block',
@@ -184,11 +189,7 @@ export function AudioRecorderWithVisualization({
 
       <div style={{ marginBottom: '12px' }}>
         <div style={{ fontWeight: 'bold' }}>
-          {isRecording 
-            ? isPaused 
-              ? "Recording Paused" 
-              : "Recording..."
-            : "Not Recording"}
+          {isRecording ? (isPaused ? 'Recording Paused' : 'Recording...') : 'Not Recording'}
         </div>
         <div>Duration: {formatDuration(recordingDuration)}</div>
       </div>
@@ -239,7 +240,7 @@ export function AudioRecorderWithVisualization({
                 Resume
               </button>
             )}
-            
+
             <button
               onClick={handleStopRecording}
               style={{
@@ -253,7 +254,7 @@ export function AudioRecorderWithVisualization({
             >
               Stop
             </button>
-            
+
             <button
               onClick={cancelRecording}
               style={{
@@ -291,4 +292,4 @@ export function AudioRecorderWithVisualization({
   );
 }
 
-export default AudioRecorderWithVisualization; 
+export default AudioRecorderWithVisualization;
