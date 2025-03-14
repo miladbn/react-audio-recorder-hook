@@ -72,10 +72,6 @@ jobs:
           cache: 'pnpm'
 
       # Try to install with frozen lockfile first
-      - name: Install dependencies (frozen)
-        id: frozen-install-publish
-        run: pnpm install --frozen
-        continue-on-error: true
 
       # If frozen install fails, update the lockfile
       - name: Install dependencies (update lockfile)
