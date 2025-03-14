@@ -1,0 +1,19 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "out": "docs",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeExternals": true,
+  "includeVersion": true,
+  "readme": "README.md",
+  "name": "React Audio Recorder Hook",
+  "plugin": ["typedoc-plugin-markdown"],
+  "sort": ["visibility", "alphabetical"],
+  "categorizeByGroup": true,
+  "categoryOrder": ["Hook", "Types", "Options", "Return Values", "*"],
+  "navigationLinks": {
+    "GitHub": "https://github.com/miladbn/react-audio-recorder-hook",
+    "NPM": "https://www.npmjs.com/package/react-audio-recorder-hook"
+  }
+}
