@@ -34,6 +34,7 @@ For comprehensive documentation, see the following resources:
 - [Advanced Usage](./docs-src/advanced-usage.md)
 - [Troubleshooting](./docs-src/troubleshooting.md)
 - [Contributing Guide](./docs-src/contributing.md)
+- [Best Practices](./docs-src/best-practices.md)
 
 ## Basic Usage
 
