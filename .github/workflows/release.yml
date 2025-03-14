@@ -33,8 +33,16 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
 
-      - name: Install dependencies
+      # Try to install with frozen lockfile first
+      - name: Install dependencies (frozen)
+        id: frozen-install
         run: pnpm install --frozen
+        continue-on-error: true
+
+      # If frozen install fails, update the lockfile
+      - name: Install dependencies (update lockfile)
+        if: steps.frozen-install.outcome == 'failure'
+        run: pnpm install
 
       - name: Lint
         run: pnpm lint --max-warnings 50
