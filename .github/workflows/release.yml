@@ -33,11 +33,8 @@ jobs:
           node-version: 'lts/*'
           cache: 'pnpm'
 
-      # Try to install with frozen lockfile first
-
       # If frozen install fails, update the lockfile
       - name: Install dependencies (update lockfile)
-        if: steps.frozen-install.outcome == 'failure'
         run: pnpm install --no-frozen-lockfile
 
       - name: Lint

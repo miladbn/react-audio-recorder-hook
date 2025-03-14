@@ -75,7 +75,6 @@ jobs:
 
       # If frozen install fails, update the lockfile
       - name: Install dependencies (update lockfile)
-        if: steps.frozen-install-publish.outcome == 'failure'
         run: pnpm install --no-frozen-lockfile
 
       - name: Build package
