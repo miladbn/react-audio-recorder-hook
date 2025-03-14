@@ -1,1 +1,1 @@
-export { default as AudioRecorderWithVisualization } from './AudioRecorderWithVisualization'; 
+export { default as AudioRecorderWithVisualization } from './AudioRecorderWithVisualization';
