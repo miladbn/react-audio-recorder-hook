@@ -1,5 +1,12 @@
 {
-  "branches": ["main", "master"],
+  "branches": [
+    "main",
+    "master",
+    {
+      "name": "beta",
+      "prerelease": true
+    }
+  ],
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
@@ -17,5 +24,8 @@
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ]
-  ]
+  ],
+  "github": false,
+  "githubUrl": false,
+  "githubApiPathPrefix": false
 }

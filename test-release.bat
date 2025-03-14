@@ -1,0 +1,3 @@
+@echo off
+echo Running semantic-release with local configuration...
+npx semantic-release --dry-run --no-ci --extends ./local-release-config.json 
