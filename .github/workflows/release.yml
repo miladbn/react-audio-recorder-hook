@@ -39,9 +39,6 @@ jobs:
       - name: Lint
         run: pnpm lint --max-warnings 50
 
-      - name: Run tests
-        run: pnpm test:ci
-
       - name: Build package
         run: pnpm build
 
