@@ -1,6 +1,6 @@
 {
   "name": "react-audio-recorder-hook",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A powerful TypeScript-based React hook that provides complete audio recording capabilities with pause/resume functionality, recording management, and audio processing",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",
