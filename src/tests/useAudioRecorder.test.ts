@@ -135,10 +135,10 @@ describe('useAudioRecorder', () => {
 
     // Mock setInterval to increment recordingDuration
     const originalSetInterval = global.setInterval;
-    global.setInterval = vi.fn(callback => {
+    global.setInterval = vi.fn().mockImplementation((callback, ms) => {
       // Call callback immediately to increment counter
       callback();
-      return 123 as any; // Return fake timer ID
+      return 123 as unknown as NodeJS.Timeout;
     });
 
     // Mock clearInterval

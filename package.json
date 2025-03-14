@@ -2,24 +2,27 @@
   "name": "react-audio-recorder-hook",
   "version": "1.0.0",
   "description": "A powerful TypeScript-based React hook that provides complete audio recording capabilities with pause/resume functionality, recording management, and audio processing",
-  "main": "dist/index.js",
-  "module": "dist/index.modern.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.modern.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
     },
     "./examples": {
-      "import": "./dist/examples/index.modern.js",
-      "require": "./dist/examples/index.js",
-      "types": "./dist/examples/index.d.ts"
+      "import": "./dist/esm/examples/index.js",
+      "require": "./dist/cjs/examples/index.js",
+      "types": "./dist/types/examples/index.d.ts"
     }
   },
   "scripts": {
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist && npm run build:types && npm run build:esm && npm run build:cjs",
+    "build:types": "tsc --declaration --declarationDir dist/types --emitDeclarationOnly",
+    "build:esm": "tsc --outDir dist/esm --module ES2020",
+    "build:cjs": "tsc --outDir dist/cjs --module CommonJS",
     "prepare": "npm run build",
     "prepublishOnly": "npm run lint && npm run test",
     "test": "vitest run",
