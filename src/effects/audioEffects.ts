@@ -88,17 +88,16 @@ function createReverbEffect(
   const convolver = context.createConvolver();
 
   // Create impulse response (simplified version)
-  const impulseLength = params.decay ?? 2;
-  const sampleRate = context.sampleRate;
-  const impulse = context.createBuffer(2, sampleRate * impulseLength, sampleRate);
+  const { decay = 2 } = params;
+  const { sampleRate } = context;
+  const impulse = context.createBuffer(2, sampleRate * decay, sampleRate);
 
   // Fill the buffer with an impulse response
   for (let channel = 0; channel < impulse.numberOfChannels; channel++) {
     const impulseData = impulse.getChannelData(channel);
     for (let i = 0; i < impulseData.length; i++) {
       // Simple exponential decay
-      impulseData[i] =
-        (Math.random() * 2 - 1) * Math.pow(1 - i / impulseData.length, impulseLength);
+      impulseData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / impulseData.length, decay);
     }
   }
 

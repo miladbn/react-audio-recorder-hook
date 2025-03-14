@@ -221,7 +221,7 @@ export default function useAudioRecorder(
         mimeTypeRef.current = getSupportedMimeType();
         const recorder = new MediaRecorder(stream, {
           mimeType: mimeTypeRef.current,
-          audioBitsPerSecond: audioBitsPerSecond,
+          audioBitsPerSecond,
         });
         setMediaRecorder(recorder);
 
@@ -453,7 +453,7 @@ export default function useAudioRecorder(
 
         // Apply the new effect
         if (audioContextRef.current && mediaSourceRef.current) {
-          const destination = audioContextRef.current.destination;
+          const { destination } = audioContextRef.current;
           applyAudioEffect(audioContextRef.current, mediaSourceRef.current, destination, effect);
         }
       } catch (err) {
