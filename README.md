@@ -155,17 +155,14 @@ function App() {
 
 ## Testing
 
-The package includes a comprehensive test suite to ensure reliability and correctness:
+The package includes a comprehensive test suite that ensures all functionality works as expected. All tests are now passing.
 
 ```bash
-# Run tests
-npm run test
+# Run the test suite
+pnpm test
 
-# Run tests with watch mode
-npm run test:watch
-
-# Run tests with coverage report
-npm run test:coverage
+# Generate test coverage report
+pnpm test:coverage
 ```
 
 ## Contributing

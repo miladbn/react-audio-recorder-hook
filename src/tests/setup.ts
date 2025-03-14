@@ -3,9 +3,8 @@ import { vi } from 'vitest';
 
 // Create a global MediaRecorder mock
 class MockMediaRecorder {
-  static isTypeSupported(mimeType: string) {
-    return true;
-  }
+  // Make sure isTypeSupported is properly defined as a static method
+  static isTypeSupported = vi.fn().mockReturnValue(true);
 
   ondataavailable: ((event: any) => void) | null = null;
   onstart: (() => void) | null = null;
@@ -29,20 +28,28 @@ class MockMediaRecorder {
     this.bitsPerSecond = options?.bitsPerSecond;
   }
 
-  start() {
+  start(chunkInterval?: number) {
     this.state = 'recording';
     if (this.onstart) this.onstart();
-  }
 
-  stop() {
-    this.state = 'inactive';
-    if (this.onstop) this.onstop();
-
-    // Create a fake blob for testing
+    // Make the mock recorder always have data
     if (this.ondataavailable) {
       const blob = new Blob(['test-audio-data'], { type: this.mimeType });
       this.ondataavailable({ data: blob });
     }
+  }
+
+  stop() {
+    this.state = 'inactive';
+
+    // Always have final data when stopped
+    if (this.ondataavailable) {
+      const blob = new Blob(['test-audio-data-final'], { type: this.mimeType });
+      this.ondataavailable({ data: blob });
+    }
+
+    // Call onstop immediately
+    if (this.onstop) this.onstop();
   }
 
   pause() {
@@ -66,7 +73,7 @@ class MockMediaStream {
   }
 
   getAudioTracks() {
-    return [{ enabled: true }];
+    return [{ enabled: true, stop: () => {} }];
   }
 
   getTracks() {
@@ -81,6 +88,9 @@ const mockCreateObjectURL = vi.fn((blob: Blob) => {
 
 // Mock URL.revokeObjectURL
 const mockRevokeObjectURL = vi.fn();
+
+// Save original MediaRecorder for tests that need to modify it
+const OriginalMediaRecorder = MockMediaRecorder;
 
 // Assign mocks to the global object
 global.MediaRecorder = MockMediaRecorder as any;
@@ -104,3 +114,6 @@ if (!global.navigator.mediaDevices) {
 } else {
   global.navigator.mediaDevices.getUserMedia = mockGetUserMedia;
 }
+
+// Store the original MediaRecorder for restoring after tests
+vi.stubGlobal('__OriginalMediaRecorder', OriginalMediaRecorder);

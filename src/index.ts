@@ -192,18 +192,25 @@ export default function useAudioRecorder(
   }, [mediaRecorder, timer]);
 
   const createAudioBlob = useCallback(() => {
+    // Check if we have audio chunks to work with
     if (audioChunksRef.current.length === 0 && pausedChunksRef.current.length === 0) {
       return null;
     }
 
-    mediaRecorder?.state === 'recording' && mediaRecorder.pause();
+    // If recording is still active, pause it to access the data safely
+    if (mediaRecorder?.state === 'recording') {
+      mediaRecorder.pause();
+    }
 
+    // Combine all audio chunks
     const allChunks = [...pausedChunksRef.current, ...audioChunksRef.current];
 
+    // Create a blob from the chunks
     const audioBlob = new Blob(allChunks, {
       type: mimeTypeRef.current,
     });
 
+    // Ensure we have valid data
     if (audioBlob.size === 0) {
       return null;
     }

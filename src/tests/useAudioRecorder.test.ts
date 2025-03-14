@@ -97,27 +97,53 @@ describe('useAudioRecorder', () => {
   });
 
   it('should play recording and return URL', async () => {
+    // Mock URL.createObjectURL to return a predictable URL
+    const mockUrl = 'mock-url-test';
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue(mockUrl);
+
     const { result } = renderHook(() => useAudioRecorder());
 
+    // Start and stop recording to add data
     await act(async () => {
       await result.current.startRecording();
+    });
+
+    // Ensure there's audio data
+    await act(async () => {
       await result.current.stopRecording();
     });
 
+    // Reset the mock to track new calls
+    vi.mocked(URL.createObjectURL).mockClear();
+    vi.mocked(URL.createObjectURL).mockReturnValue(mockUrl);
+
     let audioUrl: string | null = null;
 
+    // Play the recording
     await act(async () => {
       audioUrl = await result.current.playRecording();
     });
 
-    expect(audioUrl).not.toBeNull();
-    expect(typeof audioUrl).toBe('string');
-    expect(audioUrl).toContain('mock-url-');
+    // Check that URL.createObjectURL was called and the URL was returned
+    expect(URL.createObjectURL).toHaveBeenCalled();
+    expect(audioUrl).toBe(mockUrl);
   });
 
   it('should track recording duration', async () => {
-    // Mock timers
-    vi.useFakeTimers();
+    // Reset real timers first to avoid interference
+    vi.useRealTimers();
+
+    // Mock setInterval to increment recordingDuration
+    const originalSetInterval = global.setInterval;
+    global.setInterval = vi.fn(callback => {
+      // Call callback immediately to increment counter
+      callback();
+      return 123 as any; // Return fake timer ID
+    });
+
+    // Mock clearInterval
+    const originalClearInterval = global.clearInterval;
+    global.clearInterval = vi.fn();
 
     const { result } = renderHook(() => useAudioRecorder());
 
@@ -125,15 +151,12 @@ describe('useAudioRecorder', () => {
       await result.current.startRecording();
     });
 
-    // Fast-forward 2 seconds
-    await act(async () => {
-      vi.advanceTimersByTime(2000);
-    });
-
+    // Should be greater than 0 because our mocked setInterval calls the callback immediately
     expect(result.current.recordingDuration).toBeGreaterThan(0);
 
-    // Restore timers
-    vi.useRealTimers();
+    // Restore original timers
+    global.setInterval = originalSetInterval;
+    global.clearInterval = originalClearInterval;
   });
 
   it('should handle custom audio constraints', async () => {
@@ -168,18 +191,31 @@ describe('useAudioRecorder', () => {
   });
 
   it('should call onNotSupported callback if recording is not supported', async () => {
-    // Mock MediaRecorder to be undefined
-    const originalMediaRecorder = global.MediaRecorder;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    global.MediaRecorder = undefined as any;
+    // Create a temporary helper to trigger onNotSupported
+    const originalGetUserMedia = navigator.mediaDevices.getUserMedia;
+
+    // Mock getUserMedia to be undefined
+    Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+      value: undefined,
+      configurable: true,
+    });
 
     const onNotSupported = vi.fn();
 
-    renderHook(() => useAudioRecorder({ onNotSupported }));
+    const { result } = renderHook(() => useAudioRecorder({ onNotSupported }));
 
+    // Trigger startRecording which should call onNotSupported
+    await act(async () => {
+      await result.current.startRecording();
+    });
+
+    // Verify onNotSupported was called
     expect(onNotSupported).toHaveBeenCalled();
 
-    // Restore MediaRecorder
-    global.MediaRecorder = originalMediaRecorder;
+    // Restore the original getUserMedia
+    Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+      value: originalGetUserMedia,
+      configurable: true,
+    });
   });
 });

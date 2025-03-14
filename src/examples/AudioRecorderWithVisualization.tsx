@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-uses-react */
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React from 'react'; // This import is needed for JSX
+import { useEffect, useRef, useState, useCallback } from 'react';
 import useAudioRecorder from '../index';
 
 interface AudioRecorderWithVisualizationProps {
