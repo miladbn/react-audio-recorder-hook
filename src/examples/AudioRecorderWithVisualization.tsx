@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-uses-react */
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import useAudioRecorder from '../index';
 
@@ -38,59 +39,7 @@ export function AudioRecorderWithVisualization({
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Define AudioContext type
-  type AudioContextType = typeof window.AudioContext;
-
-  // Set up audio analysis functions with useCallback to memoize them
-  const setupAudioAnalysis = useCallback(() => {
-    if (!mediaStream || !canvasRef.current) return;
-
-    // Create audio context and analyser
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const audioAnalyser = audioContext.createAnalyser();
-    audioAnalyser.fftSize = 256;
-
-    // Connect the media stream to the analyser
-    const audioSource = audioContext.createMediaStreamSource(mediaStream);
-    audioSource.connect(audioAnalyser);
-
-    // Store references
-    audioContextRef.current = audioContext;
-    audioAnalyserRef.current = audioAnalyser;
-
-    // Start visualization
-    startVisualization();
-  }, [mediaStream]);
-
-  // Define cleanupAudioAnalysis with useCallback before using it in useEffect
-  const cleanupAudioAnalysis = useCallback(() => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-
-    if (audioContextRef.current) {
-      audioContextRef.current.close().catch(console.error);
-      audioContextRef.current = null;
-    }
-
-    audioAnalyserRef.current = null;
-  }, []);
-
-  // Use the dependency now that it's defined with useCallback
-  useEffect(() => {
-    if (mediaStream && isRecording && !isPaused) {
-      setupAudioAnalysis();
-    } else if (!isRecording || isPaused) {
-      cleanupAudioAnalysis();
-    }
-
-    return () => {
-      cleanupAudioAnalysis();
-    };
-  }, [mediaStream, isRecording, isPaused, setupAudioAnalysis, cleanupAudioAnalysis]);
-
-  const startVisualization = () => {
+  const startVisualization = useCallback(() => {
     if (!canvasRef.current || !audioAnalyserRef.current) return;
 
     const canvas = canvasRef.current;
@@ -132,7 +81,64 @@ export function AudioRecorderWithVisualization({
     };
 
     draw();
-  };
+  }, [backgroundColor, barColor]);
+
+  const setupAudioAnalysis = useCallback(() => {
+    if (!mediaStream || !canvasRef.current) return;
+
+    // Create audio context and analyser with better type handling
+    let audioContext: AudioContext;
+    try {
+      // Modern browsers
+      audioContext = new AudioContext();
+    } catch (e) {
+      // For older browsers that might use the prefixed version
+      // Use ts-expect-error instead of ts-ignore
+      // @ts-expect-error WebkitAudioContext may not exist in the window type
+      audioContext = new window.webkitAudioContext();
+      // No need to check for null since this will throw if not available
+    }
+
+    const audioAnalyser = audioContext.createAnalyser();
+    audioAnalyser.fftSize = 256;
+
+    // Connect the media stream to the analyser
+    const audioSource = audioContext.createMediaStreamSource(mediaStream);
+    audioSource.connect(audioAnalyser);
+
+    // Store references
+    audioContextRef.current = audioContext;
+    audioAnalyserRef.current = audioAnalyser;
+
+    // Start visualization
+    startVisualization();
+  }, [mediaStream, startVisualization]);
+
+  const cleanupAudioAnalysis = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(console.error);
+      audioContextRef.current = null;
+    }
+
+    audioAnalyserRef.current = null;
+  }, []);
+
+  useEffect(() => {
+    if (mediaStream && isRecording && !isPaused) {
+      setupAudioAnalysis();
+    } else if (!isRecording || isPaused) {
+      cleanupAudioAnalysis();
+    }
+
+    return () => {
+      cleanupAudioAnalysis();
+    };
+  }, [mediaStream, isRecording, isPaused, setupAudioAnalysis, cleanupAudioAnalysis]);
 
   const handleStartRecording = async () => {
     await startRecording();

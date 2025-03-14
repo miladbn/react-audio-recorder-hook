@@ -170,6 +170,7 @@ describe('useAudioRecorder', () => {
   it('should call onNotSupported callback if recording is not supported', async () => {
     // Mock MediaRecorder to be undefined
     const originalMediaRecorder = global.MediaRecorder;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     global.MediaRecorder = undefined as any;
 
     const onNotSupported = vi.fn();

@@ -75,7 +75,7 @@ export default function useAudioRecorder(
   const startRecording = useCallback(async () => {
     try {
       cleanupAudioUrl();
-
+      // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         if (onNotSupported) {
           onNotSupported();

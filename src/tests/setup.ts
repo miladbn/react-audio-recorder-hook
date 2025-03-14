@@ -1,5 +1,5 @@
 // Mock MediaRecorder API and other browser features
-import { vi } from "vitest";
+import { vi } from 'vitest';
 
 // Create a global MediaRecorder mock
 class MockMediaRecorder {
@@ -14,7 +14,7 @@ class MockMediaRecorder {
   onresume: (() => void) | null = null;
   onerror: ((event: any) => void) | null = null;
 
-  state: "inactive" | "recording" | "paused" = "inactive";
+  state: 'inactive' | 'recording' | 'paused' = 'inactive';
   stream: MediaStream;
   mimeType: string;
   audioBitsPerSecond?: number;
@@ -23,35 +23,35 @@ class MockMediaRecorder {
 
   constructor(stream: MediaStream, options?: MediaRecorderOptions) {
     this.stream = stream;
-    this.mimeType = options?.mimeType || "audio/webm";
+    this.mimeType = options?.mimeType ?? 'audio/webm';
     this.audioBitsPerSecond = options?.audioBitsPerSecond;
     this.videoBitsPerSecond = options?.videoBitsPerSecond;
     this.bitsPerSecond = options?.bitsPerSecond;
   }
 
   start() {
-    this.state = "recording";
+    this.state = 'recording';
     if (this.onstart) this.onstart();
   }
 
   stop() {
-    this.state = "inactive";
+    this.state = 'inactive';
     if (this.onstop) this.onstop();
 
     // Create a fake blob for testing
     if (this.ondataavailable) {
-      const blob = new Blob(["test-audio-data"], { type: this.mimeType });
+      const blob = new Blob(['test-audio-data'], { type: this.mimeType });
       this.ondataavailable({ data: blob });
     }
   }
 
   pause() {
-    this.state = "paused";
+    this.state = 'paused';
     if (this.onpause) this.onpause();
   }
 
   resume() {
-    this.state = "recording";
+    this.state = 'recording';
     if (this.onresume) this.onresume();
   }
 }
@@ -89,15 +89,13 @@ global.URL.createObjectURL = mockCreateObjectURL;
 global.URL.revokeObjectURL = mockRevokeObjectURL;
 
 // Mock getUserMedia using Object.defineProperty to avoid the read-only error
-const mockGetUserMedia = vi
-  .fn()
-  .mockImplementation(async (constraints: MediaStreamConstraints) => {
-    return new MockMediaStream();
-  });
+const mockGetUserMedia = vi.fn().mockImplementation(async (constraints: MediaStreamConstraints) => {
+  return new MockMediaStream();
+});
 
 // Fix for readonly mediaDevices property
 if (!global.navigator.mediaDevices) {
-  Object.defineProperty(global.navigator, "mediaDevices", {
+  Object.defineProperty(global.navigator, 'mediaDevices', {
     value: {
       getUserMedia: mockGetUserMedia,
     },
