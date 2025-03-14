@@ -35,6 +35,7 @@ For comprehensive documentation, see the following resources:
 - [Troubleshooting](./docs-src/troubleshooting.md)
 - [Contributing Guide](./docs-src/contributing.md)
 - [Best Practices](./docs-src/best-practices.md)
+- [Auto-publishing Guide](./docs-src/auto-publishing.md)
 
 ## Basic Usage
 
