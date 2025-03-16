@@ -5,6 +5,7 @@
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/types/index.d.ts",
+  "typings": "dist/types/index.d.ts",
   "source": "src/index.ts",
   "exports": {
     ".": {
@@ -16,11 +17,12 @@
       "import": "./dist/esm/examples/index.js",
       "require": "./dist/cjs/examples/index.js",
       "types": "./dist/types/examples/index.d.ts"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "rimraf dist && npm run build:types && npm run build:esm && npm run build:cjs",
-    "build:types": "tsc --declaration --declarationDir dist/types --emitDeclarationOnly",
+    "build:types": "tsc --declaration --declarationDir dist/types --emitDeclarationOnly --declarationMap",
     "build:esm": "tsc --outDir dist/esm --module ES2020",
     "build:cjs": "tsc --outDir dist/cjs --module CommonJS",
     "prepare": "npm run build",
