@@ -16,6 +16,12 @@ A powerful, TypeScript-based React hook for recording, managing, and processing 
 - **Audio Visualization**: Example component demonstrates how to add audio waveform visualization
 - **Comprehensive Tests**: Complete test suite ensures reliability
 
+## Support
+
+If you find this package helpful, you can support its development by buying me a coffee:
+
+[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/miladbn)
+
 ## Installation
 
 ```bash
