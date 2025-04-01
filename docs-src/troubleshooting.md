@@ -97,6 +97,60 @@ const { startRecording } = useAudioRecorder({
 });
 ```
 
+### iOS-Specific MIME Type Issues
+
+**Symptom**: Audio recording works on desktop and Android, but fails on iOS devices, particularly with playback or processing.
+
+**Solutions**:
+
+1. Use version 1.0.5 or later of the library which includes automatic iOS detection and format adaptation
+2. Explicitly set an iOS-compatible MIME type
+
+```jsx
+const { startRecording, saveRecording } = useAudioRecorder({
+  // iOS Safari supports these formats better than WebM
+  preferredMimeType: 'audio/mp4',
+  // Alternatively: 'audio/aac' or 'audio/mpeg'
+});
+
+// When saving or uploading, ensure the file extension matches the format
+const handleSave = async () => {
+  const recording = await saveRecording();
+  if (recording) {
+    // Use .m4a extension for mp4 audio on iOS
+    downloadBlob(recording.blob, 'recording.m4a');
+
+    // Or when uploading:
+    const formData = new FormData();
+    formData.append('audio', recording.blob, 'recording.m4a');
+    await fetch('/upload', { method: 'POST', body: formData });
+  }
+};
+```
+
+3. If implementing your own solution, detect iOS with a user agent check:
+
+```jsx
+const isIOS = () => {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+         !(window as any).MSStream; // Excludes IE11
+};
+
+// Then use this to determine MIME type
+const getMimeType = () => {
+  if (isIOS()) {
+    return MediaRecorder.isTypeSupported('audio/mp4')
+      ? 'audio/mp4'
+      : 'audio/aac';
+  }
+  return 'audio/webm';
+};
+```
+
+4. For older iOS versions, you may need a polyfill or alternative approach for MediaRecorder
+
+5. Always ensure your web app is served over HTTPS, as iOS is strict about requiring secure contexts for media APIs
+
 ## Playback Issues
 
 ### Audio Not Playing After Recording

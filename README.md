@@ -182,3 +182,20 @@ See our [improvements document](./src/tests/IMPROVEMENTS.md) for planned enhance
 ## License
 
 MIT
+
+## Troubleshooting
+
+### iOS Compatibility
+
+Version 1.0.5 and later includes improved compatibility with iOS devices by automatically detecting iOS browsers and using compatible audio formats (mp4/aac). If you experience issues with audio recording on iOS:
+
+1. Ensure you're using the latest version of the package
+2. You can explicitly set a compatible MIME type using the `preferredMimeType` option:
+   ```jsx
+   useAudioRecorder({
+     preferredMimeType: 'audio/mp4',
+   });
+   ```
+3. For iOS Safari, ensure your app has proper microphone permissions and is served over HTTPS
+
+If you still encounter issues on iOS devices, please report them on our [GitHub issues page](https://github.com/miladbn/react-audio-recorder-hook/issues).

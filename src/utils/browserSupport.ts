@@ -40,6 +40,15 @@ export function isMimeTypeSupported(mimeType: string): boolean {
 }
 
 /**
+ * Check if the current browser is iOS
+ */
+export function isIOS(): boolean {
+  if (typeof navigator === 'undefined') return false;
+
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream; // Excludes IE11
+}
+
+/**
  * Get the best supported MIME type for the current browser
  */
 export function getBestSupportedMimeType(): string {
@@ -47,6 +56,27 @@ export function getBestSupportedMimeType(): string {
     return '';
   }
 
+  // iOS-optimized MIME types first if on iOS
+  if (isIOS()) {
+    const iOSMimeTypes = [
+      'audio/mp4;codecs=mp4a',
+      'audio/mp4',
+      'audio/aac',
+      'audio/x-m4a',
+      'audio/mpeg',
+      'audio/3gpp', // Common on mobile
+      'audio/wav',
+      'audio/webm', // Last resort
+    ];
+
+    for (const mimeType of iOSMimeTypes) {
+      if (MediaRecorder.isTypeSupported(mimeType)) {
+        return mimeType;
+      }
+    }
+  }
+
+  // Standard MIME types for other browsers (original list)
   const mimeTypes = [
     'audio/webm;codecs=opus',
     'audio/webm',
@@ -94,4 +124,5 @@ export default {
   getBestSupportedMimeType,
   isAudioRecordingSupported,
   isMobileBrowser,
+  isIOS,
 };

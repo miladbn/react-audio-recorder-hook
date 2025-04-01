@@ -26,6 +26,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependency version issues for c8 and other packages
 - Added @types/node to fix NodeJS namespace type errors
 
+## [1.0.5] - 2024-03-25
+
+### Fixed
+
+- iOS compatibility issue with audio MIME types
+- Added detection for iOS devices and automatic format selection
+- Updated blob creation to use iOS-friendly formats (mp4/aac) when on iOS devices
+- Added troubleshooting section in README for iOS-specific guidance
+
 ## [0.1.0] - Initial Release
 
 ### Added

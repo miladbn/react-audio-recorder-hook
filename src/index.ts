@@ -340,9 +340,23 @@ export default function useAudioRecorder(
     // Combine all audio chunks
     const allChunks = [...pausedChunksRef.current, ...audioChunksRef.current];
 
-    // Create a blob from the chunks
+    // Checking for iOS support
+    const isIOSDevice = browserSupport.isIOS();
+
+    // For iOS devices, use mp4/aac format if possible which is better supported
+    let blobType = mimeTypeRef.current;
+    if (isIOSDevice && !blobType.includes('mp4') && !blobType.includes('aac')) {
+      // Try to use mp4 if the recorded MIME type isn't already an iOS-friendly format
+      if (browserSupport.isMimeTypeSupported('audio/mp4')) {
+        blobType = 'audio/mp4';
+      } else if (browserSupport.isMimeTypeSupported('audio/aac')) {
+        blobType = 'audio/aac';
+      }
+    }
+
+    // Create a blob from the chunks using the appropriate MIME type
     const audioBlob = new Blob(allChunks, {
-      type: mimeTypeRef.current,
+      type: blobType,
     });
 
     // Ensure we have valid data
