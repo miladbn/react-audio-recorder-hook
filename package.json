@@ -101,7 +101,7 @@
   "bugs": {
     "url": "https://github.com/miladbn/react-audio-recorder-hook/issues"
   },
-  "homepage": "https://github.com/miladbn/react-audio-recorder-hook#readme",
+  "homepage": "https://miladbn.github.io/react-audio-recorder-docs/",
   "engines": {
     "node": ">=14.0.0"
   },
