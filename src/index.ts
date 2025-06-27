@@ -479,6 +479,9 @@ export default function useAudioRecorder(
 
   useEffect(() => {
     return () => {
+      if (mediaRecorder?.state !== "inactive") {
+        return;
+      }
       if (timer) {
         clearInterval(timer);
       }
