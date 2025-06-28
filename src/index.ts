@@ -491,7 +491,7 @@ export default function useAudioRecorder(
         clearTimeout(volumeTimerRef.current);
       }
 
-      if (audioContextRef.current) {
+      if (audioContextRef.current  && audioContextRef.current.state !== "closed") {
         audioContextRef.current.close().catch(console.error);
       }
 
