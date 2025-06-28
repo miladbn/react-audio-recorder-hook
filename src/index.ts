@@ -173,6 +173,7 @@ export default function useAudioRecorder(
         // Set up volume metering using AudioContext
         try {
           // Create audio context
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           const audioContext = new (window.AudioContext ||
             // @ts-expect-error - webkitAudioContext for Safari
             window.webkitAudioContext)();
@@ -194,7 +195,6 @@ export default function useAudioRecorder(
           const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
           const updateVolume = () => {
-            if (!analyser) return;
 
             analyser.getByteFrequencyData(dataArray);
 
@@ -287,6 +287,8 @@ export default function useAudioRecorder(
     timer,
     cleanupAudioUrl,
     audioConstraints,
+    audioBitsPerSecond,
+    browserCompatibility.isSupported,
     chunkInterval,
     onNotSupported,
     volumeMeterRefreshRate,
@@ -466,6 +468,7 @@ export default function useAudioRecorder(
         }
 
         // Apply the new effect
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (audioContextRef.current && mediaSourceRef.current) {
           const { destination } = audioContextRef.current;
           applyAudioEffect(audioContextRef.current, mediaSourceRef.current, destination, effect);
@@ -479,6 +482,10 @@ export default function useAudioRecorder(
 
   useEffect(() => {
     return () => {
+      if (mediaRecorder?.state !== "inactive") {
+        return;
+      }
+
       if (timer) {
         clearInterval(timer);
       }
@@ -488,14 +495,14 @@ export default function useAudioRecorder(
         clearTimeout(volumeTimerRef.current);
       }
 
-      if (audioContextRef.current) {
+      if (audioContextRef.current  && audioContextRef.current.state !== "closed") {
         audioContextRef.current.close().catch(console.error);
       }
 
       stopMediaStream(mediaStream);
       cleanupAudioUrl();
     };
-  }, [mediaStream, stopMediaStream, timer, cleanupAudioUrl]);
+  }, [mediaStream, stopMediaStream, timer, cleanupAudioUrl, mediaRecorder]);
 
   return {
     startRecording,
